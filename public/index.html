@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Circular App</title>
+</head>
+<body>
+  <h1>Circular App</h1>
+  
+  <form id="circularForm" enctype="multipart/form-data">
+    <label for="title">Title:</label>
+    <input type="text" id="title" name="title" required><br>
+    <label for="file">Upload File:</label>
+    <input type="file" id="file" name="file" required><br>
+    <button type="submit">Create Circular</button>
+  </form>
+
+  <div id="circularList"></div>
+
+  <script>
+    // Function to fetch circulars from the server and display them
+    async function fetchCirculars() {
+      const response = await fetch('/api/circular');
+      const circulars = await response.json();
+
+      const circularList = document.getElementById('circularList');
+      circularList.innerHTML = '';
+
+      circulars.forEach(circular => {
+        const div = document.createElement('div');
+        div.textContent = `Title: ${circular.title}, Upload Date: ${new Date(circular.uploadDate).toLocaleDateString()}`;
+        circularList.appendChild(div);
+      });
+    }
+
+    // Function to handle form submission
+    async function handleFormSubmit(event) {
+      event.preventDefault();
+      
+      const title = document.getElementById('title').value;
+      const fileInput = document.getElementById('file');
+      const file = fileInput.files[0];
+
+      const formData = new FormData();
+      formData.append('title', title);
+      formData.append('file', file);
+
+      const response = await fetch('/api/circular', {
+        method: 'POST',
+        body: formData
+      });
+
+      if (response.ok) {
+        document.getElementById('title').value = ''; // Clear input field
+        fileInput.value = ''; // Clear file input
+        fetchCirculars(); // Refresh circular list
+      } else {
+        alert('Failed to create circular');
+      }
+    }
+
+    // Attach event listener to form submission
+    const circularForm = document.getElementById('circularForm');
+    circularForm.addEventListener('submit', handleFormSubmit);
+
+    // Fetch circulars when the page loads
+    fetchCirculars();
+  </script>
+</body>
+</html>
