@@ -1,4 +1,4 @@
 # Ignore the upload folder
 /uploads
 
-/.env
+.env
