@@ -3,6 +3,7 @@ const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 const multer = require('multer');
 const path = require('path');
+const fs = require('fs'); // Import the Node.js file system module
 
 const app = express();
 
@@ -40,7 +41,12 @@ const Circular = mongoose.model('circular', new mongoose.Schema({
 // Multer middleware for file upload
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
-    cb(null, 'uploads/');
+    const uploadDir = 'uploads/';
+    // Check if the directory exists, create it if it doesn't
+    if (!fs.existsSync(uploadDir)) {
+      fs.mkdirSync(uploadDir);
+    }
+    cb(null, uploadDir);
   },
   filename: function (req, file, cb) {
     cb(null, Date.now() + path.extname(file.originalname));
